@@ -61,9 +61,37 @@ interface OdooApiService  {
         @Body data: Any
     ): Call<BaseResponse<T>>
 
+    // Authentication
+    @POST("/web/session/authenticate")
+    fun authenticate(@Body request: AuthenticationRequest): Call<AuthenticationResponse>
+
+    // Get User Session Info
+    @POST("/web/session/get_session_info")
+    fun getSessionInfo(): Call<SessionInfoResponse>
+
+    // List of Models - Example for res.partner model
+    @POST("/web/dataset/search_read")
+    fun getPartnerList(@Body request: ModelListRequest): Call<ModelListResponse>
+
+    // Specific Record Details - Example for res.partner model
+    @POST("/web/dataset/call_kw/{model}/{method}")
+    fun callMethod(
+        @Path("model") model: String,
+        @Path("method") method: String,
+        @Body request: CallMethodRequest
+    ): Call<CallMethodResponse>
+
 }
+data class AuthenticationRequest(val username: String, val password: String)
+data class AuthenticationResponse(val success: Boolean, val errorMessage: String?)
 
+data class SessionInfoResponse(val user: String, val userId: Int, val session_id: String)
 
+data class ModelListRequest(val model: String, val fields: List<String>, val domain: List<List<Any>>?)
+data class ModelListResponse(val records: List<Map<String, Any>>)
+
+data class CallMethodRequest(val args: List<Any>)
+data class CallMethodResponse(val result: Any)
 
 //    companion object {
 //        private const val BASE_URL = "https://odoo.linklusion.co.jp/"
